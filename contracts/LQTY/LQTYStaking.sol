@@ -83,7 +83,7 @@ contract LQTYStaking is ILQTYStaking, Ownable, CheckContract, BaseMath {
         book = IBOOKToken(_book);
 
         emit LQTYTokenAddressSet(_lqtyTokenAddress);
-        emit LQTYTokenAddressSet(_lusdTokenAddress);
+        emit LUSDTokenAddressSet(_lusdTokenAddress);
         emit TroveManagerAddressSet(_troveManagerAddress);
         emit BorrowerOperationsAddressSet(_borrowerOperationsAddress);
         emit ActivePoolAddressSet(_activePoolAddress);

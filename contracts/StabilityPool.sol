@@ -653,7 +653,7 @@ contract StabilityPool is LiquityBase, Ownable, CheckContract, IStabilityPool {
 
         activePoolCached.sendETH(address(this), _collToAdd);
         ETH = ETH.add(_collToAdd);
-        StabilityPoolETHBalanceUpdated(ETH);
+        emit StabilityPoolETHBalanceUpdated(ETH);
     }
 
     function _decreaseLUSD(uint _amount) internal {

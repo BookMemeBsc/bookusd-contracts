@@ -123,8 +123,7 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
         address _book,
         uint _startTime
     ) external override onlyOwner {
-        // This makes impossible to open a trove with zero withdrawn LUSD
-        assert(MIN_NET_DEBT > 0);
+        require(startTime == 0, "BorrowerOperations: already deployed");
 
         checkContract(_troveManagerAddress);
         checkContract(_activePoolAddress);

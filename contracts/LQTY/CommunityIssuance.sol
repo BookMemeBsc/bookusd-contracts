@@ -53,8 +53,7 @@ contract CommunityIssuance is ICommunityIssuance, Ownable, CheckContract, BaseMa
         address _stabilityPoolAddress,
         uint256 _startTime
     ) external override onlyOwner {
-
-        
+        require(deploymentTime == 0, "CommunityIssuance: already deployed");
 
         checkContract(_lqtyTokenAddress);
         checkContract(_stabilityPoolAddress);
@@ -75,9 +74,7 @@ contract CommunityIssuance is ICommunityIssuance, Ownable, CheckContract, BaseMa
     function issueLQTY() external override returns (uint) {
         _requireCallerIsStabilityPool();
 
-        uint latestTotalLQTYIssued = LQTYSupplyCap.mul(_getCumulativeIssuanceFraction()).div(
-            DECIMAL_PRECISION
-        );
+        uint latestTotalLQTYIssued = LQTYSupplyCap.mul(_getCumulativeIssuanceFraction()).div(DECIMAL_PRECISION);
         uint issuance = latestTotalLQTYIssued.sub(totalLQTYIssued);
 
         totalLQTYIssued = latestTotalLQTYIssued;
