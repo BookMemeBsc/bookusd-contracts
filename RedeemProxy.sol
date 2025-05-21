@@ -1,12 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.6.11;
 
-import "./Dependencies/Ownable.sol";
 import "./Interfaces/ILUSDToken.sol";
 import "./Interfaces/IBOOKToken.sol";
 import "./Interfaces/ITroveManager.sol";
 import "./Interfaces/ITwapOracle.sol";
-import "./Interfaces/ISortedTroves.sol";
 
 interface IHintHelper {
     function getRedemptionHints(
@@ -22,13 +20,12 @@ interface IHintHelper {
     ) external view returns (address hintAddress, uint diff, uint latestRandomSeed);
 }
 
-contract RedeemProxy is Ownable {
+contract RedeemProxy {
     IBOOKToken public constant BOOK = IBOOKToken(0xC9Ad421f96579AcE066eC188a7Bba472fB83017F);
     ILUSDToken public constant BUD = ILUSDToken(0xc28957E946AC244612BcB205C899844Cbbcb093D);
     IHintHelper public constant hintHelper = IHintHelper(0xa3dd985a59cfA95E4353B4Ecf0Fc803327B7cE63);
     ITwapOracle public constant oracle = ITwapOracle(0x7B30280DDEB0514b587b3a9Bd178C9dF9293bb23);
     ITroveManager public constant troveManager = ITroveManager(0xFe5D0aBb0C4Addbb57186133b6FDb7E1FAD1aC15);
-    ISortedTroves public constant sortedTroves = ISortedTroves(0x2E658E118886B2c176fC53B493322B6FC5215edc);
 
     uint32 public twapDuration;
 
@@ -94,35 +91,11 @@ contract RedeemProxy is Ownable {
         return hintHelper.getRedemptionHints(_amount, price, _maxIterations);
     }
 
-    function getApproxHint(uint256 _CR) internal view returns (address hintAddress) {
-        uint256 totalTroves = sortedTroves.getSize();
-        (hintAddress, , ) = hintHelper.getApproxHint(_CR, totalTroves * 15, 42);
-    }
-
-    function getInsertPosition(
-        uint256 _CR,
-        address _approxHint
-    ) internal view returns (address upperHint, address lowerHint) {
-        (upperHint, lowerHint) = sortedTroves.findInsertPosition(_CR, _approxHint, _approxHint);
-    }
-
     function _returnBUD(uint256 _amount) internal {
         BUD.transfer(msg.sender, _amount);
     }
 
     function _returnBOOK(uint256 _amount) internal {
         BOOK.transfer(msg.sender, _amount);
-    }
-
-    function adminUpdateTwapDuration(uint32 _twapDuration) external onlyOwner {
-        require(_twapDuration > 0, "RedeemProxy: twap duration must be greater than 0");
-        twapDuration = _twapDuration;
-    }
-
-    function adminWithdrawToken(address _token) external onlyOwner {
-        require(_token != address(0), "RedeemProxy: token is zero address");
-
-        uint256 _amount = IERC20(_token).balanceOf(address(this));
-        IERC20(_token).transfer(msg.sender, _amount);
     }
 }
